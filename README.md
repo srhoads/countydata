@@ -1,2 +1,2 @@
-# countydata
-Importing data from online
+# countydata comes from the census
+https://www.census.gov/support/USACdataDownloads.html
