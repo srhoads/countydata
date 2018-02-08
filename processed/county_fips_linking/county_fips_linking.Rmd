@@ -1,0 +1,34 @@
+---
+title: "fips_linking"
+author: "SRhoads"
+date: "1/15/2018"
+output: html_document
+---
+NOTICE: must have package `mapproj` downloaded
+
+### Welcome to **SRhoads's prelude to playing with massive county datasets**. 
+#### Here, we'll get to link the mapproj county data to census-format variables.
+
+```{r}
+library(mapproj) # library holds the data
+summary(county.fips$fips <- as.factor(county.fips$fips)) # cleaning fips ID code
+summary(county.fips$polyname) # original county format
+```
+
+
+#### Load and format census fips/county/state linking file. **No need to change path**; should load as is.
+
+```{r}
+census_county <- read.delim(url("https://www2.census.gov/geo/docs/reference/codes/files/national_county.txt"), sep = ",", col.names = c("state", "state_fips", "county_fips", "county", "fips_class_code"), colClasses = c("factor", "numeric", "factor", "factor", "factor")) # change classes for logistical reasons (need county_fips to be 3 digits for mapping, so read as factor)
+census_county$state_fips <- as.factor(census_county$state_fips) # change state_fips to factor now instead of prior step bc we don't want extra 0s digit in front
+census_county$fips <- paste(census_county$state_fips, census_county$county_fips) # basically same as concatenate in excel (joining state + county fips)
+census_county$fips <- gsub(" ", "", census_county$fips) # get rid of the space to match mapproj fips IDs
+```
+
+
+#### **Final dataframe**; can save to harddrive if desired.
+
+```{r}
+summary(county_fips_linking <- merge(county.fips, census_county, by = "fips", all = T)) # merge/join mapproj df with census_county linking file by fips
+# save(county_fips_linking, file = "county_fips_linking.rda") # commented out, but running like will download r data file
+```
